@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Viewed;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * @extends ServiceEntityRepository<Viewed>
@@ -14,6 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Viewed[]    findAll()
  * @method Viewed[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
+
 class ViewedRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -50,15 +53,31 @@ class ViewedRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    //get the x most viewed videos (x set as parameter)
-    public function findMostViewed(int $limit): array
+    //get the number of view for all videos ordered desc (no parameter)
+    public function findAllViews(): array
     {
         return $this->createQueryBuilder('viewed')
             ->select('video.id, COUNT(viewed.id) as viewCount')
             ->leftJoin('viewed.video', 'video')
             ->groupBy('video.id')
             ->orderBy('viewCount', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    //get the x most viewed videos (x set as parameter)
+    public function findMostViewed(int $limit): array
+    {
+        $now = new DateTimeImmutable();
+
+        return $this->createQueryBuilder('viewed')
+            ->select('video.id, COUNT(viewed.id) as viewCount')
+            ->leftJoin('viewed.video', 'video')
+            ->andWhere('video.postDate < :today')
+            ->groupBy('video.id')
+            ->orderBy('viewCount', 'DESC')
             ->setMaxResults($limit)
+            ->setParameter('today', $now, Types::DATETIME_IMMUTABLE)
             ->getQuery()
             ->getResult();
     }
@@ -66,14 +85,29 @@ class ViewedRepository extends ServiceEntityRepository
     //get unique videos viewed by a user, sorted antichronologically (user_id as parameter)
     public function findVideosViewedByUser(int $userId): array
     {
-        $queryBuilder = $this->createQueryBuilder('viewed')
+        $now = new DateTimeImmutable();
+
+        return $this->createQueryBuilder('viewed')
             ->select('video.id')
             ->join('viewed.video', 'video')
             ->andWhere('viewed.user = :userId')
+            ->andWhere('video.postDate < :today')
             ->setParameter('userId', $userId)
             ->groupBy('video.id')
-            ->orderBy('MAX(viewed.viewDate)', 'DESC');
+            ->orderBy('MAX(viewed.viewDate)', 'DESC')
+            ->setParameter('today', $now, Types::DATETIME_IMMUTABLE)
+            ->getQuery()
+            ->getResult();
+    }
 
-        return $queryBuilder->getQuery()->getResult();
+    //clean viewed entity form user_id is null AND video_id is null
+    public function deleteNullUserAndNullVideo(): bool
+    {
+        return $this->createQueryBuilder('viewed')
+            ->delete()
+            ->where('viewed.user IS NULL')
+            ->andWhere('viewed.video IS NULL')
+            ->getQuery()
+            ->getResult();
     }
 }

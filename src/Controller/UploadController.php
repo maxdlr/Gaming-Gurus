@@ -11,7 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class UploadController extends AbstractController
 {
     #[Route('/upload', name: 'upload_video')]
@@ -33,6 +35,7 @@ class UploadController extends AbstractController
                 $video = $form->getData();
                 $video->setVideoUrl($fileName);
                 $video->setPosterUrl($fileNameThumb);
+                $video->setIsPremium(false);
                 $saveVideoService->saveVideoFile($fileName);
                 $videoRepository->save($video, true);
                 $this->addFlash('success', 'Vidéo ajoutée avec succès');

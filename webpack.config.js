@@ -28,6 +28,14 @@ Encore
         from: './assets/videos',
         to: 'videos/[path][name].[ext]',
     })
+    .copyFiles({
+        from: './assets/avatars',
+        to: 'avatars/[path][name].[ext]',
+    })
+    .copyFiles({
+        from: './assets/favicon',
+        to: 'favicon/[path][name].[ext]',
+    })
     /*
      * ENTRY CONFIG
      *
@@ -41,6 +49,10 @@ Encore
     .addEntry('playAndCount', './assets/playAndCount.js')
     .addEntry('displayViewCount', './assets/displayViewCount.js')
     .addEntry('navbar', './assets/navbar.js')
+    .addEntry('comment', './assets/comment.js')
+    .addEntry('searchVideos', './assets/searchVideos.js')
+    .addEntry('avatar', './assets/avatar.js')
+    .addEntry('userDashboard', './assets/userDashboard.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')

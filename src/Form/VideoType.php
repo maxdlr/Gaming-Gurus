@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use DateTimeImmutable;
 
 class VideoType extends AbstractType
 {
@@ -28,10 +27,10 @@ class VideoType extends AbstractType
                 'required' => true
             ])
             ->add('postDate', DateTimeType::class, [
+                'widget' => 'single_text',
                 'label' => 'Date de publication:',
                 'input' => 'datetime_immutable',
                 'view_timezone' => 'Europe/Paris',
-                'data' => new DateTimeImmutable(),
                 'required' => true
             ])
             ->add('tag', EntityType::class, [

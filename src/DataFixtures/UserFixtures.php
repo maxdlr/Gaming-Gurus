@@ -12,20 +12,82 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 {
     public const USERS = [
         [
-            'email' => 'user1@user.fr',
-            'username' => 'Max'
+            'email' => 'maxime@gmail.com',
+            'username' => 'Maxime',
+            'role' => 'ROLE_ADMIN',
+            'avatar' => 'avatar-maxime.png'
         ],
         [
-            'email' => 'user2@user.fr',
-            'username' => 'Fred'
+            'email' => 'frederic@gmail.com',
+            'username' => 'Frederic',
+            'role' => 'ROLE_ADMIN',
+            'avatar' => 'avatar-fred.png'
         ],
         [
-            'email' => 'user3@user.fr',
-            'username' => 'Valentin'
+            'email' => 'valentin@gmail.com',
+            'username' => 'Valentin',
+            'role' => 'ROLE_ADMIN',
+            'avatar' => 'avatar-valentin.png'
         ],
         [
-            'email' => 'user4@user.fr',
-            'username' => 'Thomas'
+            'email' => 'thomas@gmail.com',
+            'username' => 'Thomas',
+            'role' => '',
+            'avatar' => 'avatar-thomas.png'
+        ],
+        [
+            'email' => 'ludovic@gmail.com',
+            'username' => 'Ludovic',
+            'role' => '',
+            'avatar' => 'avatar-ludovic.png'
+        ],
+        [
+            'email' => 'anthony@gmail.com',
+            'username' => 'Anthony',
+            'role' => '',
+            'avatar' => 'avatar-anthony.png'
+        ],
+        [
+            'email' => 'aurelien@gmail.com',
+            'username' => 'Aurélien',
+            'role' => '',
+            'avatar' => 'avatar-aurelien.png'
+        ],
+        [
+            'email' => 'baptiste@gmail.com',
+            'username' => 'Baptiste',
+            'role' => '',
+            'avatar' => 'avatar-baptiste.png'
+        ],
+        [
+            'email' => 'benjamin@gmail.com',
+            'username' => 'Benjamin',
+            'role' => '',
+            'avatar' => 'avatar-benjamin.png'
+        ],
+        [
+            'email' => 'laetitia@gmail.com',
+            'username' => 'Laetitia',
+            'role' => '',
+            'avatar' => 'avatar-laetitia.png'
+        ],
+        [
+            'email' => 'mouhamed@gmail.com',
+            'username' => 'Mouhamed',
+            'role' => '',
+            'avatar' => 'avatar-mouhamed.png'
+        ],
+        [
+            'email' => 'axel@gmail.com',
+            'username' => 'Axel',
+            'role' => '',
+            'avatar' => 'avatar-axel.png'
+        ],
+        [
+            'email' => 'zakaria@gmail.com',
+            'username' => 'Zakaria',
+            'role' => '',
+            'avatar' => 'avatar-zakaria.png'
         ],
     ];
 
@@ -44,14 +106,22 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
                 $user,
                 'password'
             ));
-            $user->setRoles([]);
+            $user->setRoles([$userItem['role']]);
+            if ($userItem['role'] == 'ROLE_ADMIN') {
+                $user->setIsAdmin(true);
+            } else {
+                $user->setIsAdmin(false);
+            }
+
             $user->setIsVerified(true);
 
             $maxValue = (count(VideoFixtures::VIDEOS)) - 1;
-            for ($i = 0; $i < 4; $i++) {
+            for ($i = 0; $i < rand(5, 10); $i++) {
                 $user->addFavoriteVideo($this->getReference('video_' . rand(0, $maxValue)));
                 $user->addViewLaterVideo($this->getReference('video_' . rand(0, $maxValue)));
             }
+
+            $user->setAvatar($userItem['avatar']);
 
             $manager->persist($user);
             $this->addReference('user_' . $count, $user);
